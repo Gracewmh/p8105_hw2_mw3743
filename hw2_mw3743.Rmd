@@ -58,6 +58,34 @@ trans_entr_df |>
 ```
 - 37.70% of station entrances / exits without vending allow entrance.  
 
+## Reformat data 
+To make route number and route name distinct variables. 
+1. How many distinct stations serve the A train?
+```{r}
+trans_entr_df |> 
+    pivot_longer(
+      cols = route1:route11,
+      names_to = "route_num", 
+      values_to = "route") |> 
+    filter(route == "A") |> 
+    select(station_name, line) |>
+    distinct()
+```
+- There are 60 distinct stations serve the A train.
+
+2. Of the stations that serve the A train, how many are ADA compliant?
+```{r}
+trans_entr_df |> 
+    pivot_longer(
+      cols = route1:route11,
+      names_to = "route_num", 
+      values_to = "route") |> 
+    filter(route == "A", ada == TRUE) |> 
+    select(station_name, line) |>
+    distinct()
+```
+- Of the stations that serve the A train, 17 stations are ADA compliant.
+
 # Problem 2
 ```{r}
 
