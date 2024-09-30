@@ -1,14 +1,19 @@
 ---
-title: "HW2 Data Wrangling I."
+title: "HW2 Data Wrangling I"
+author: "Minghui Wang" 
+date: '`r format(Sys.time(), "%Y-%m-%d")`'
 output: github_document
 ---
-
-Author: Minghui Wang<br>
-Date: 2024-09-29
 
 ```{r setup, echo = FALSE, message = FALSE}
 library(tidyverse)
 library(readxl)
 library(haven)
 ```
-This is the first module in the Data Wrangling I topic.
+[HW2](https://p8105.com/homework_2.html) assignment reinforces ideas in [Data Wrangling I](https://p8105.com/topic_data_wrangling_i.html). Here are the codes focusing on question 1-3.
+
+# Problem 1
+
+# Problem 2
+# Problem 3
+
