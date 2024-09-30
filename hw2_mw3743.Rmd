@@ -13,7 +13,7 @@ library(haven)
 [HW2](https://p8105.com/homework_2.html) assignment reinforces ideas in [Data Wrangling I](https://p8105.com/topic_data_wrangling_i.html). Here are the codes focusing on question 1-3.
 
 # Problem 1
-## Import and clean the NYC Transit CSV
+## Import and clean the NYC Transit.csv
 ```{r}
 trans_entr_df <- 
   read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv",
@@ -22,7 +22,7 @@ trans_entr_df <-
   select(
     line, station_name, station_latitude, station_longitude, starts_with("route"), entry, vending, entrance_type, ada
   ) |> 
-  mutate(entry = if_else(entry == "Yes", TRUE, FALSE))
+  mutate(entry = if_else(entry == "YES", TRUE, FALSE))
 ```
 
 ```{r}
@@ -30,6 +30,33 @@ dim(trans_entr_df)
 ```
 A short paragraph about this dataset:
 This dataset contains 32 variables, with 22 being character variables (such as Division, Line, Station Name, and Route1 to Route7), 8 being numeric variables (including Station Latitude, Station Longitude, Entrance Latitude, and Entrance Longitude), and 2 being logical variables (ADA and Free Crossover). So far, I have standardized the column names by converting them to lowercase and treated all route variables as character types. The resulting dataset has dimensions of 1868 rows and 19 columns. Currently, the data is not tidy because the route numbers are spread across multiple columns (from "Route1" to "Route11") rather than being combined into a single column as a variable.
+
+## Answer Questions
+1. How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St 8th Avenue; 125st Broadway; 125st Lenox); the distinct function may be useful here.
+```{r}
+trans_entr_df |> 
+  select(station_name, line) |>
+  distinct()
+```
+- There are 465 distinct stations.
+
+2. How many stations are ADA compliant?
+```{r}
+trans_entr_df |> 
+  filter(ada == "TRUE")|>
+  select(station_name, line) |>
+  distinct()
+```
+- There are 84 distinct stations which are ADA compliant.
+
+3. What proportion of station entrances / exits without vending allow entrance?
+```{r}
+trans_entr_df |> 
+  filter(vending == "NO")|>
+  pull(entry) |>
+  mean()
+```
+- 37.70% of station entrances / exits without vending allow entrance.  
 
 # Problem 2
 ```{r}
