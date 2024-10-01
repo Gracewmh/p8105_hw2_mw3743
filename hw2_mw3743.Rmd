@@ -158,7 +158,15 @@ sum_trash_whl_df =
   relocate(trash_wheel) 
 ```
 
+## Write a paragraph about these data
+
+The combined dataset contains `r nrow(sum_trash_whl_df)` observations, providing detailed information on trash-related information collected by three trash wheels inn Maryland. Key variables in the dataset include `r colnames(sum_trash_whl_df)`. The total weight of trash collected by Professor Trash Wheel is `r prof_trash_whl_df |> drop_na(weight_tons) |> pull(weight_tons) |> sum()` tons. Additionally, the total number of cigarette butts collected by Gwynnda in June of 2022 is `r gwynd_trash_whl_df |> filter(year == 2022, month == "June") |> pull(cigarette_butts) |> sum()`.
+
+
+
 # Problem 3
 ```{r}
+
 ```
+
 
