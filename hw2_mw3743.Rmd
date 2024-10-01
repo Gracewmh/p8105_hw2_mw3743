@@ -94,12 +94,13 @@ trans_entr_df |>
 - omit rows that do not include dumpster-specific data
 - round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
 ```{r}
-trash_whl_df = 
+mr_trash_whl_df =
   read_excel("data/202409_Trash_Wheel_Collection_Data.xlsx" , 
              #specify the sheet in the Excel file
              sheet = 'Mr. Trash Wheel',
              #omit non-data entries
-             skip = 1, 
+             range = cell_cols(1:14),
+             skip = 1,
              na = c("NA", "", "."))|> 
   #use reasonable variable names
   janitor::clean_names()|> 
@@ -108,21 +109,56 @@ trash_whl_df =
   #round the number of sports balls to the nearest integer and converts the result to an integer variable
   mutate(sports_balls = as.integer(round(sports_balls)))
 ```
-
+## Read and clean the Professor Trash Wheel sheet 
 ```{r}
-
+prof_trash_whl_df = 
+  read_excel("data/202409_Trash_Wheel_Collection_Data.xlsx" , 
+             #specify the sheet in the Excel file
+             sheet = 'Professor Trash Wheel',
+             #omit non-data entries
+             skip = 1, 
+             na = c("NA", "", "."))|> 
+  #use reasonable variable names
+  janitor::clean_names()|> 
+  #omit rows that do not include dumpster-specific data
+  drop_na(dumpster) |>
+  #round the number of sports balls to the nearest integer and converts the result to an integer variable
+  mutate(trash_wheel = "Professor Trash Wheel")
 ```
-Use a similar process to import, clean, and organize the data for Professor Trash Wheel and Gwynnda, and combine this with the Mr. Trash Wheel dataset to produce a single tidy dataset. To keep track of which Trash Wheel is which, you may need to add an additional variable to both datasets before combining.
-
-Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables. For available data, what was the total weight of trash collected by Professor Trash Wheel? What was the total number of cigarette butts collected by Gwynnda in June of 2022?
-
-
-
+## Read and clean the Gwynnda Trash Wheel sheet
 ```{r}
-
+gwynd_trash_whl_df = 
+  read_excel("data/202409_Trash_Wheel_Collection_Data.xlsx" , 
+             #specify the sheet in the Excel file
+             sheet = 'Gwynnda Trash Wheel',
+             #omit non-data entries
+             skip = 1, 
+             na = c("NA", "", "."))|> 
+  #use reasonable variable names
+  janitor::clean_names()|> 
+  #omit rows that do not include dumpster-specific data
+  drop_na(dumpster) |>
+  #round the number of sports balls to the nearest integer and converts the result to an integer variable
+  mutate(trash_wheel = "Gwynnda Trash Wheel")
 ```
+
+## Combine these three datasets
+- produce a single tidy dataset. 
+- add an additional variable to both datasets before combining to keep track of which Trash Wheel is.
+```{r}
+mr_trash_whl_df = mutate(mr_trash_whl_df, 
+                         year = as.double(year),
+                         trash_wheel = "Mr. Trash Wheel")
+
+sum_trash_whl_df = 
+  bind_rows(mr_trash_whl_df, prof_trash_whl_df, gwynd_trash_whl_df) |> 
+  pivot_longer(cols = volume_cubic_yards:sports_balls, 
+               names_to = "trash_type", 
+               values_to = "amount")|> 
+  relocate(trash_wheel) 
+```
+
 # Problem 3
 ```{r}
-
 ```
 
