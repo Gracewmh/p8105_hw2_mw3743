@@ -162,20 +162,20 @@ The combined dataset contains `r nrow(sum_trash_whl_df)` observations, providing
 
 # Problem 3
 ## Create a single, well-organized dataset with all the information contained in these data files. 
-### Import, clean, tidy, and wrangle of bakers; 
+### Import, clean, tidy, and wrangle of `bakers`; 
 ```{r, message = FALSE}
 baker_df = read_csv('data/gbb_datasets/bakers.csv',na = c("NA", "", ".")) |>
   janitor::clean_names()|> 
   separate(baker_name, into = c("baker_fist_name", "baker_last_name"), sep = " ")
 ```
-### Import, clean, tidy, and wrangle of bakes;
+### Import, clean, tidy, and wrangle of ``bakes`;
 ```{r, message = FALSE}
 bake_df = read_csv('data/gbb_datasets/bakes.csv',
                    na = c("NA", "", ".") )|> 
  janitor::clean_names() |>
  rename(baker_fist_name = baker)
 ```
-### Import, clean, tidy, and wrangle of results; 
+### Import, clean, tidy, and wrangle of `results`; 
 ```{r, message = FALSE}
 result_df = read_csv('data/gbb_datasets/results.csv',na = c("NA", "", "."),
                      skip = 2) |>
@@ -193,7 +193,6 @@ result_df = read_csv('data/gbb_datasets/results.csv',na = c("NA", "", "."),
     )
   )
 ```
-
 ### Check for completeness and correctness across datasets
 e.g. by viewing individual datasets and using anti_join 
 ```{r}
@@ -219,15 +218,21 @@ write_csv(result_baker_bake_df, "data/result_baker_bake.csv")
 ```
 
 ## Describe data cleaning process
-including any questions you have or choices you made. Briefly discuss the final dataset.
+Including any questions you have or choices made. Briefly discuss the final dataset.<br>
 
-## Analyzing Star Baker Trends: A Look at Winners from Seasons 5 to 10
+1. The data cleaning process involved several key steps. First, all three datasets (`bakers.csv`, `bakes.csv`, and `results.csv`) were imported, specified the missing values and standardized column names to lowercase with underscores, enhancing clarity and consistency. In `baker_df`, the `baker_name` column was split into `baker_fist_name` and `baker_last_name` for better identification of individual bakers and facilitate the future joining with the othe two datasets. Both `bake_df` and `result_df` had the `baker` column renamed to `baker_fist_name` to maintain consisitency across datasets. Lastly, in `result_df`, I convert coded values of the `result` column into more descriptive labels, such as "IN" becoming "stayed in" and "OUT" changing to "Eliminated." 
+2. The question for me is "Is it the data clean enought right now? For example, the entry of the `hometown` variable in `bakers.csv` contain both information of town and area/county, sepereated by comma. I have thought to seperate it, but ending with not for I don't think this would influence the final dataset very much and can do it later if necessary.
+3. The final datasets records the “Star Baker” of each episodes of each season, with the information of the bake and their bakes of that day. There are 11 variables and 1136 episodes in sum.
+
+## Analyzing star baker trends
 Create a reader-friendly table showing the star baker or winner of each episode in Seasons 5 through 10. Comment on this table – were there any predictable overall winners? Any surprises?
 ```{r}
-
+viewer_df = read_csv('data/gbb_datasets/viewers.csv',na = c("NA", "", ".")) |>
+  janitor::clean_names() 
+view(viewer_df)
 ```
 
-## Viewership Data in Seasons 1 & 5
+## Viewership data in seasons 1 & 5
 Import, clean, tidy, and organize the viewership data in viewers.csv. Show the first 10 rows of this dataset. What was the average viewership in Season 1? In Season 5?
 ```{r}
 
