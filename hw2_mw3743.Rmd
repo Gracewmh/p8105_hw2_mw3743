@@ -25,11 +25,8 @@ trans_entr_df =
   mutate(entry = if_else(entry == "YES", TRUE, FALSE))
 ```
 
-```{r}
-dim(trans_entr_df)
-```
-A short paragraph about this dataset:
-This dataset contains 32 variables, with 22 being character variables (such as Division, Line, Station Name, and Route1 to Route7), 8 being numeric variables (including Station Latitude, Station Longitude, Entrance Latitude, and Entrance Longitude), and 2 being logical variables (ADA and Free Crossover). So far, I have standardized the column names by converting them to lowercase and treated all route variables as character types. The resulting dataset has dimensions of 1868 rows and 19 columns. Currently, the data is not tidy because the route numbers are spread across multiple columns (from "Route1" to "Route11") rather than being combined into a single column as a variable.
+**A short paragraph about this dataset**:
+This dataset contains 32 variables, with 22 being character variables (such as Division, Line, Station Name, and Route1 to Route7), 8 being numeric variables (including Station Latitude, Station Longitude, Entrance Latitude, and Entrance Longitude), and 2 being logical variables (ADA and Free Crossover). So far, I have standardized the column names by converting them to lowercase and treated all route variables as character types. The resulting dataset has dimensions of `r nrow(trans_entr_df)` rows and `r ncol(trans_entr_df)` columns. Currently, the data is not tidy because the route numbers are spread across multiple columns (from "Route1" to "Route11") rather than being combined into a single column as a variable.
 
 ## Answer Questions
 1. How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St 8th Avenue; 125st Broadway; 125st Lenox); the distinct function may be useful here.
@@ -61,7 +58,7 @@ trans_entr_df |>
 ## Reformat data 
 To make route number and route name distinct variables. 
 1. How many distinct stations serve the A train?
-```{r}
+```{r, results='hide', message=FALSE}
 trans_entr_df |> 
     pivot_longer(
       cols = route1:route11,
@@ -163,8 +160,75 @@ sum_trash_whl_df =
 The combined dataset contains `r nrow(sum_trash_whl_df)` observations, providing detailed information on trash-related information collected by three trash wheels inn Maryland. Key variables in the dataset include `r colnames(sum_trash_whl_df)`. The total weight of trash collected by Professor Trash Wheel is `r prof_trash_whl_df |> drop_na(weight_tons) |> pull(weight_tons) |> sum()` tons. Additionally, the total number of cigarette butts collected by Gwynnda in June of 2022 is `r gwynd_trash_whl_df |> filter(year == 2022, month == "June") |> pull(cigarette_butts) |> sum()`.
 
 
-
 # Problem 3
+## Create a single, well-organized dataset with all the information contained in these data files. 
+### Import, clean, tidy, and wrangle of bakers; 
+```{r, message = FALSE}
+baker_df = read_csv('data/gbb_datasets/bakers.csv',na = c("NA", "", ".")) |>
+  janitor::clean_names()|> 
+  separate(baker_name, into = c("baker_fist_name", "baker_last_name"), sep = " ")
+```
+### Import, clean, tidy, and wrangle of bakes;
+```{r, message = FALSE}
+bake_df = read_csv('data/gbb_datasets/bakes.csv',
+                   na = c("NA", "", ".") )|> 
+ janitor::clean_names() |>
+ rename(baker_fist_name = baker)
+```
+### Import, clean, tidy, and wrangle of results; 
+```{r, message = FALSE}
+result_df = read_csv('data/gbb_datasets/results.csv',na = c("NA", "", "."),
+                     skip = 2) |>
+  janitor::clean_names() |>
+  rename(baker_fist_name = baker) |>
+  mutate(
+    result = case_match(
+      result, 
+      "IN" ~ "stayed in",
+      "OUT" ~ "Eliminated",
+      "STAR BAKER" ~ "Star Baker",
+      "WINNER" ~ "Series Winner",
+      "Runner-up" ~ "Series Runner up",
+      "WD" ~ "withdrew"
+    )
+  )
+```
+
+### Check for completeness and correctness across datasets
+e.g. by viewing individual datasets and using anti_join 
+```{r}
+anti_join(baker_df, bake_df)
+anti_join(result_df, baker_df)
+anti_join(result_df, bake_df)
+```
+### Merge to a single, final dataset and organize it
+To make variables and observations in meaningful orders. 
+```{r}
+result_baker_bake_df = result_df |>
+  left_join(baker_df, by = c("series", "baker_fist_name")) |>
+  left_join(bake_df, by = c("series", "baker_fist_name", "episode")) |>
+  relocate(baker_last_name, .after = baker_fist_name)|>
+  relocate(technical, .before =show_stopper)
+view(result_baker_bake_df)
+```
+
+###  Export the result file
+Save as a CSV in the directory containing the original datasets.
+```{r}
+write_csv(result_baker_bake_df, "data/result_baker_bake.csv")
+```
+
+## Describe data cleaning process
+including any questions you have or choices you made. Briefly discuss the final dataset.
+
+## Analyzing Star Baker Trends: A Look at Winners from Seasons 5 to 10
+Create a reader-friendly table showing the star baker or winner of each episode in Seasons 5 through 10. Comment on this table – were there any predictable overall winners? Any surprises?
+```{r}
+
+```
+
+## Viewership Data in Seasons 1 & 5
+Import, clean, tidy, and organize the viewership data in viewers.csv. Show the first 10 rows of this dataset. What was the average viewership in Season 1? In Season 5?
 ```{r}
 
 ```
