@@ -227,15 +227,44 @@ Including any questions you have or choices made. Briefly discuss the final data
 ## Analyzing star baker trends
 Create a reader-friendly table showing the star baker or winner of each episode in Seasons 5 through 10. Comment on this table – were there any predictable overall winners? Any surprises?
 ```{r}
-viewer_df = read_csv('data/gbb_datasets/viewers.csv',na = c("NA", "", ".")) |>
-  janitor::clean_names() 
-view(viewer_df)
+result_baker_bake_df |> 
+  filter(series >= 5 & series <= 10 & result == "Star Baker") |>
+  mutate(
+    winner_name = paste(baker_fist_name, baker_last_name),
+    series_episode = paste(series, episode, sep = ":"),
+    won = 1
+  ) |>
+  select(series_episode, winner_name, won) |> 
+  pivot_wider(
+    names_from = series_episode, 
+    values_from = won,
+    values_fill = list(won = 0)
+  ) |> 
+  mutate(total_wins = rowSums(across(where(is.numeric)))) |>
+  knitr::kable()
+
 ```
+Based on the total number of wins, the most predictable overall winner would be Richard Burr. Interestingly, despite his 5 wins in Season 5, he didn’t win any further times in Seasons 6 through 10. If we focus on the top performer in Season 10, Steph Blackwell stands out as the overall winner, as all her 4 wins were achieved during that season.
 
 ## Viewership data in seasons 1 & 5
-Import, clean, tidy, and organize the viewership data in viewers.csv. Show the first 10 rows of this dataset. What was the average viewership in Season 1? In Season 5?
+Import, clean, tidy, and organize the viewership data in viewers.csv. Show the first 10 rows of this dataset. 
 ```{r}
-
+viewer_df = read_csv('data/gbb_datasets/viewers.csv' ,na = c("NA", "", ".")) |>
+  janitor::clean_names() 
+head(viewer_df, 10)
 ```
+## Average viewership in Season 1 and 5
+```{r}
+# Because there are null value in viewership in Season 1, we should only calculate the mean among those non-null values, which is row 1-6:
+viewer_df |> 
+  slice(1:6)|> 
+  pull(series_1) |>
+  mean()
 
-
+# Viewership in Season 5
+viewer_df |> 
+  pull(series_5) |>
+  mean()
+```
+The average viewership in Season 1 is `r viewer_df |> slice(1:6)|> pull(series_1) |> mean()`.
+The average viewership in Season 5 is `r viewer_df |> pull(series_5) |> mean()`.
