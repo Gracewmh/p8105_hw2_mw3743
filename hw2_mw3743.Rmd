@@ -156,7 +156,21 @@ sum_trash_whl_df =
 ```
 
 ## Write a paragraph about these data
-The combined dataset contains `r nrow(sum_trash_whl_df)` rows, `r nrow(mr_trash_whl_df)+nrow(prof_trash_whl_df)+nrow(gwynd_trash_whl_df)` observations, providing detailed information on trash-related information collected by three trash wheels in Maryland. Key variables in the dataset include `r colnames(sum_trash_whl_df)`. The total weight of trash collected by Professor Trash Wheel is `r prof_trash_whl_df |> drop_na(weight_tons) |> pull(weight_tons) |> sum()` tons. Additionally, the total number of cigarette butts collected by Gwynnda in June of 2022 is `r gwynd_trash_whl_df |> filter(year == 2022, month == "June") |> pull(cigarette_butts) |> sum()`.
+The combined dataset contains `r nrow(sum_trash_whl_df)` rows, `r nrow(mr_trash_whl_df)+nrow(prof_trash_whl_df)+nrow(gwynd_trash_whl_df)` observations, providing detailed information on trash-related information collected by three trash wheels in Maryland. Variables in the dataset include `r colnames(sum_trash_whl_df)`. Key variables are the trash_type(inncluding original variable "volume_cubic_yards", "cigarette butts", "sports_balls", ect.) and corresponding amount, weight_tons and homes_powered.
+
+The total weight of trash collected by Professor Trash Wheel is `r prof_trash_whl_df |> drop_na(weight_tons) |> pull(weight_tons) |> sum()` tons. Additionally, the total number of cigarette butts collected by Gwynnda in June of 2022 is `r gwynd_trash_whl_df |> filter(year == 2022, month == "June") |> pull(cigarette_butts) |> sum()`.(These calculations are using inline R code, the original code is below).
+```{r, message=FALSE}
+# The total weight of trash collected by Professor Trash Wheel
+prof_trash_whl_df |> 
+  drop_na(weight_tons) |> 
+  pull(weight_tons) |> 
+  sum()
+# the total number of cigarette butts collected by Gwynnda in June of 2022
+gwynd_trash_whl_df |> 
+  filter(year == 2022, month == "June") |> 
+  pull(cigarette_butts) |> 
+  sum()
+```
 
 
 # Problem 3
@@ -167,7 +181,7 @@ baker_df = read_csv('data/gbb_datasets/bakers.csv',na = c("NA", "", ".")) |>
   janitor::clean_names()|> 
   separate(baker_name, into = c("baker_fist_name", "baker_last_name"), sep = " ")
 ```
-### Import, clean, tidy, and wrangle of ``bakes`
+### Import, clean, tidy, and wrangle of `bakes`
 ```{r, message = FALSE}
 bake_df = read_csv('data/gbb_datasets/bakes.csv',
                    na = c("NA", "", ".") )|> 
@@ -244,7 +258,7 @@ Including any questions you have or choices made. Briefly discuss the final data
 
 ## Analyzing star baker trends
 Create a reader-friendly table showing the star baker or winner of each episode in Seasons 5 through 10. Comment on this table – were there any predictable overall winners? Any surprises?
-**One methpod**
+### Create a reader-friendly table
 ```{r}
 result_baker_bake_df |> 
   filter(series >= 5 & series <= 10, result == "Star Baker" | result == "Series Winner") |> 
@@ -254,8 +268,7 @@ result_baker_bake_df |>
           names_prefix = "baker_star_winner_season_")|> 
 knitr::kable()
 ```
-
-**Conclusion**
+### Conclusion
 Based on the total number of wins, the most predictable overall winner would be Richard Burr. Interestingly, despite his 5 wins in Season 5, he didn’t win any further times in Seasons 6 through 10. If we focus on the top performer in Season 10, Steph Blackwell stands out as the overall winner, as all her 4 wins were achieved during that season.
 
 ## Viewership data in seasons 1 & 5
